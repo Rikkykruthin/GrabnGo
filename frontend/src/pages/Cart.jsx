@@ -9,7 +9,10 @@ const Cart = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [userLat, setUserLat] = useState('');
+  const [userLng, setUserLng] = useState('');
   const [placing, setPlacing] = useState(false);
+  const [gettingLocation, setGettingLocation] = useState(false);
   const { updateCartCount } = useCart();
   const navigate = useNavigate();
 
@@ -47,9 +50,42 @@ const Cart = () => {
     }
   };
 
+  const getUserLocation = () => {
+    setGettingLocation(true);
+    setError('');
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLat(position.coords.latitude.toString());
+          setUserLng(position.coords.longitude.toString());
+          setGettingLocation(false);
+          setError('');
+        },
+        (error) => {
+          setGettingLocation(false);
+          setError('Unable to get your location. Please enter coordinates manually or use default location.');
+          // Set default location (Bangalore coordinates as fallback)
+          setUserLat('12.9716');
+          setUserLng('77.5946');
+        }
+      );
+    } else {
+      setGettingLocation(false);
+      setError('Geolocation is not supported by your browser. Using default location.');
+      setUserLat('12.9716');
+      setUserLng('77.5946');
+    }
+  };
+
   const handlePlaceOrder = async () => {
     if (!deliveryAddress.trim()) {
       setError('Please enter delivery address');
+      return;
+    }
+
+    if (!userLat || !userLng) {
+      setError('Please get your location or enter coordinates');
       return;
     }
 
@@ -57,7 +93,11 @@ const Cart = () => {
     setError('');
 
     try {
-      const response = await placeOrder({ deliveryAddress });
+      const response = await placeOrder({ 
+        deliveryAddress,
+        userLat: parseFloat(userLat),
+        userLng: parseFloat(userLng)
+      });
       if (response.data.success) {
         updateCartCount(0);
         navigate('/orders');
@@ -116,6 +156,50 @@ const Cart = () => {
             placeholder="Enter your delivery address"
             style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid #ddd' }}
           />
+        </div>
+        <div style={{ marginTop: '1rem' }}>
+          <button
+            onClick={getUserLocation}
+            disabled={gettingLocation}
+            style={{ 
+              padding: '0.75rem 1.5rem', 
+              background: '#4CAF50', 
+              color: 'white', 
+              border: 'none', 
+              borderRadius: '4px', 
+              cursor: 'pointer',
+              marginBottom: '1rem'
+            }}
+          >
+            {gettingLocation ? 'Getting Location...' : '📍 Get My Location'}
+          </button>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div className="form-group">
+              <label>Latitude</label>
+              <input
+                type="number"
+                step="0.0001"
+                value={userLat}
+                onChange={(e) => setUserLat(e.target.value)}
+                placeholder="e.g., 12.9716"
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid #ddd' }}
+              />
+            </div>
+            <div className="form-group">
+              <label>Longitude</label>
+              <input
+                type="number"
+                step="0.0001"
+                value={userLng}
+                onChange={(e) => setUserLng(e.target.value)}
+                placeholder="e.g., 77.5946"
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid #ddd' }}
+              />
+            </div>
+          </div>
+          <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>
+            Click "Get My Location" or enter coordinates manually. Delivery fee is calculated based on distance.
+          </p>
         </div>
         <button
           className="btn"
