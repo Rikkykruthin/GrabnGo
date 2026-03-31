@@ -15,7 +15,7 @@ function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <Router>
+        <Router basename="/food-ordering-app">
           <Navbar />
           <Routes>
             <Route path="/login" element={<Login />} />

@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080/api';
+// Use relative path for production, works with both dev proxy and production
+const API_BASE_URL = window.location.hostname === 'localhost' && window.location.port === '5173' 
+  ? '/api'  // Dev server with proxy
+  : '/food-ordering-app/api';  // Production on Tomcat
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -11,7 +14,7 @@ const api = axios.create({
 });
 
 // Auth APIs
-export const register = (userData) => api.post('/auth/register', userData);
+export const register = (userData) => api.post('/auth/signup', userData);
 export const login = (credentials) => api.post('/auth/login', credentials);
 export const logout = () => api.post('/auth/logout');
 
@@ -19,17 +22,17 @@ export const logout = () => api.post('/auth/logout');
 export const getRestaurants = () => api.get('/restaurants');
 
 // Menu APIs
-export const getMenu = (restaurantId) => api.get(`/menu?restaurantId=${restaurantId}`);
+export const getMenu = (restaurantId) => api.get(`/restaurants/${restaurantId}/menu`);
 
 // Cart APIs
 export const getCart = () => api.get('/cart');
-export const addToCart = (item) => api.post('/cart/add', item);
-export const removeFromCart = (menuItemId) => api.post('/cart/remove', { menuItemId });
-export const clearCart = () => api.post('/cart/clear');
+export const addToCart = (item) => api.post('/cart/items', item);
+export const removeFromCart = (itemId) => api.delete(`/cart/items/${itemId}`);
+export const clearCart = () => api.delete('/cart');
 
 // Order APIs
-export const placeOrder = (orderData) => api.post('/orders/', orderData);
+export const placeOrder = (orderData) => api.post('/orders', orderData);
 export const getOrders = () => api.get('/orders');
-export const cancelOrder = (orderId) => api.put(`/orders/${orderId}/cancel`);
+export const cancelOrder = (orderId) => api.patch(`/orders/${orderId}/cancel`);
 
 export default api;

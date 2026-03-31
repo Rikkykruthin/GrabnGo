@@ -39,15 +39,17 @@ const Menu = () => {
         restaurantId: parseInt(restaurantId)
       };
 
+      console.log('Adding to cart:', cartItem);
       const response = await addToCartAPI(cartItem);
+      console.log('Add to cart response:', response.data);
       if (response.data.success) {
         setSuccess(`${item.name} added to cart!`);
         updateCartCount(response.data.cart.length);
         setTimeout(() => setSuccess(''), 3000);
       }
     } catch (err) {
+      console.error('Failed to add to cart:', err);
       setError('Failed to add item to cart');
-      console.error(err);
     }
   };
 

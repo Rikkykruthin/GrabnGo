@@ -25,13 +25,19 @@ const Register = () => {
     setLoading(true);
 
     try {
+      console.log('Submitting registration:', formData);
       const response = await registerAPI(formData);
+      console.log('Registration response:', response);
       if (response.data.success) {
         login(response.data.user);
         navigate('/restaurants');
+      } else {
+        setError(response.data.error || 'Registration failed');
       }
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed. Please try again.');
+      console.error('Registration error:', err);
+      console.error('Error response:', err.response);
+      setError(err.response?.data?.error || err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }

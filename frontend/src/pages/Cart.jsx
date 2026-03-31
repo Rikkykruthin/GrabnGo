@@ -19,15 +19,17 @@ const Cart = () => {
 
   const fetchCart = async () => {
     try {
+      console.log('Fetching cart...');
       const response = await getCart();
+      console.log('Cart response:', response.data);
       if (response.data.success) {
         setCart(response.data.cart);
         setTotal(response.data.total);
         updateCartCount(response.data.cart.length);
       }
     } catch (err) {
+      console.error('Failed to load cart:', err);
       setError('Failed to load cart');
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -37,10 +39,7 @@ const Cart = () => {
     try {
       const response = await removeFromCartAPI(menuItemId);
       if (response.data.success) {
-        setCart(response.data.cart);
-        const newTotal = response.data.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        setTotal(newTotal);
-        updateCartCount(response.data.cart.length);
+        fetchCart(); // Refresh the cart
       }
     } catch (err) {
       setError('Failed to remove item');
@@ -95,7 +94,7 @@ const Cart = () => {
             <div className="cart-item-info">
               <h4>{item.name}</h4>
               <p>Quantity: {item.quantity} × ${item.price.toFixed(2)}</p>
-              <p style={{ fontWeight: 'bold' }}>Subtotal: ${item.subtotal.toFixed(2)}</p>
+              <p style={{ fontWeight: 'bold' }}>Subtotal: ${((item.subtotal || item.price * item.quantity)).toFixed(2)}</p>
             </div>
             <button
               className="remove-btn"
