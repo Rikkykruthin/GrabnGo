@@ -103,6 +103,7 @@ public class AuthServlet extends HttpServlet {
             session.setAttribute("userId", registeredUser.getId());
             session.setAttribute("userEmail", registeredUser.getEmail());
             session.setAttribute("userName", registeredUser.getName());
+            session.setAttribute("userRole", registeredUser.getRole());
             
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);
@@ -142,6 +143,7 @@ public class AuthServlet extends HttpServlet {
             session.setAttribute("userId", user.getId());
             session.setAttribute("userEmail", user.getEmail());
             session.setAttribute("userName", user.getName());
+            session.setAttribute("userRole", user.getRole());
             
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);

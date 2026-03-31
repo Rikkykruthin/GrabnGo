@@ -10,8 +10,13 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
+    role VARCHAR(20) DEFAULT 'CUSTOMER',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Insert default admin user (password: admin123)
+INSERT INTO users (email, password, name, phone, role) VALUES
+('admin@grabngo.com', 'admin123', 'Admin User', '0000000000', 'ADMIN');
 
 -- Restaurants table
 CREATE TABLE restaurants (

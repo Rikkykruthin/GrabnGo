@@ -9,6 +9,7 @@ import Restaurants from './pages/Restaurants';
 import Menu from './pages/Menu';
 import Cart from './pages/Cart';
 import Orders from './pages/Orders';
+import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -38,6 +39,11 @@ function App() {
             <Route path="/orders" element={
               <ProtectedRoute>
                 <Orders />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminDashboard />
               </ProtectedRoute>
             } />
             <Route path="/" element={<Navigate to="/restaurants" />} />

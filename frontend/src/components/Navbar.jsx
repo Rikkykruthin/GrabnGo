@@ -30,6 +30,7 @@ const Navbar = () => {
               Cart {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
             </Link>
             <Link to="/orders">Orders</Link>
+            {user.role === 'ADMIN' && <Link to="/admin">Admin</Link>}
             <span>Hi, {user.name}!</span>
             <button onClick={handleLogout}>Logout</button>
           </div>

@@ -194,4 +194,52 @@ public class OrderDAO {
         
         return null;
     }
+    
+    // Admin methods
+    public List<Order> getAllOrders() throws SQLException {
+        String sql = "SELECT o.*, u.name as user_name, u.email as user_email, r.name as restaurant_name " +
+                    "FROM orders o " +
+                    "JOIN users u ON o.user_id = u.id " +
+                    "JOIN restaurants r ON o.restaurant_id = r.id " +
+                    "ORDER BY o.created_at DESC";
+        
+        List<Order> orders = new ArrayList<>();
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                Order order = new Order();
+                order.setId(rs.getInt("id"));
+                order.setUserId(rs.getInt("user_id"));
+                order.setRestaurantId(rs.getInt("restaurant_id"));
+                order.setTotalAmount(rs.getDouble("total_amount"));
+                order.setDeliveryFee(rs.getDouble("delivery_fee"));
+                order.setDistanceKm(rs.getDouble("distance_km"));
+                order.setGrandTotal(rs.getDouble("grand_total"));
+                order.setStatus(rs.getString("status"));
+                order.setDeliveryAddress(rs.getString("delivery_address"));
+                order.setCreatedAt(rs.getTimestamp("created_at"));
+                orders.add(order);
+            }
+        }
+        
+        return orders;
+    }
+    
+    public boolean updateOrderStatus(int orderId, String status) throws SQLException {
+        String sql = "UPDATE orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, status);
+            stmt.setInt(2, orderId);
+            
+            int rowsAffected = stmt.executeUpdate();
+            Logger.log("Order " + orderId + " status updated to: " + status);
+            return rowsAffected > 0;
+        }
+    }
 }
